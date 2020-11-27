@@ -2,6 +2,7 @@ package cors
 
 import (
 	"fmt"
+	"github.com/hughcube-go/utils/mshash"
 	"github.com/stretchr/testify/assert"
 	http2 "github.com/stretchr/testify/http"
 	"net/http"
@@ -61,12 +62,12 @@ func Test_GetRequestHeader(t *testing.T) {
 	a.Nil(err)
 
 	for i := 0; i <= 100; i++ {
-		name := strconv.FormatInt(time.Now().UnixNano(), 10)
+		name := randName()
 		request.Header.Set(name, name)
 		a.Equal(GetRequestHeader(request, name), name)
 	}
 
-	name := strconv.FormatInt(time.Now().UnixNano(), 10)
+	name := randName()
 	a.Equal(GetRequestHeader(request, name), "")
 }
 
@@ -77,12 +78,12 @@ func Test_HasRequestHeader(t *testing.T) {
 	a.Nil(err)
 
 	for i := 0; i <= 100; i++ {
-		name := strconv.FormatInt(time.Now().UnixNano(), 10)
+		name := randName()
 		request.Header.Set(name, name)
 		a.True(HasRequestHeader(request, name))
 	}
 
-	name := strconv.FormatInt(time.Now().UnixNano(), 10)
+	name := randName()
 	a.False(HasRequestHeader(request, name))
 }
 
@@ -104,12 +105,12 @@ func Test_GetResponseHeader(t *testing.T) {
 	writer := new(http2.TestResponseWriter)
 
 	for i := 0; i <= 100; i++ {
-		name := strconv.FormatInt(time.Now().UnixNano(), 10)
+		name := randName()
 		writer.Header().Set(name, name)
 		a.Equal(GetResponseHeader(writer, name), name)
 	}
 
-	name := strconv.FormatInt(time.Now().UnixNano(), 10)
+	name := randName()
 	a.NotEqual(GetResponseHeader(writer, name), name)
 }
 
@@ -119,12 +120,12 @@ func Test_HasResponseHeader(t *testing.T) {
 	writer := new(http2.TestResponseWriter)
 
 	for i := 0; i <= 100; i++ {
-		name := strconv.FormatInt(time.Now().UnixNano(), 10)
+		name := randName()
 		writer.Header().Set(name, name)
 		a.True(HasResponseHeader(writer, name))
 	}
 
-	name := strconv.FormatInt(time.Now().UnixNano(), 10)
+	name := randName()
 	a.False(HasResponseHeader(writer, name))
 }
 
@@ -134,12 +135,12 @@ func Test_SetResponseHeader(t *testing.T) {
 	writer := new(http2.TestResponseWriter)
 
 	for i := 0; i <= 100; i++ {
-		name := strconv.FormatInt(time.Now().UnixNano(), 10)
+		name := randName()
 		SetResponseHeader(writer, name, name)
 		a.Equal(writer.Header().Get(name), name)
 	}
 
-	name := strconv.FormatInt(time.Now().UnixNano(), 10)
+	name := randName()
 	a.NotEqual(writer.Header().Get(name), name)
 }
 
@@ -152,4 +153,11 @@ func Test_SetResponseStatusCode(t *testing.T) {
 		SetResponseStatusCode(writer, i)
 		a.Equal(writer.StatusCode, i)
 	}
+}
+
+var randValue int64 = 0
+
+func randName() string {
+	randValue++
+	return mshash.MD5(strconv.FormatInt(randValue, 10))
 }
